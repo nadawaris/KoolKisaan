@@ -149,8 +149,8 @@ iitr/
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/<YOUR-USERNAME>/<YOUR-REPO-NAME>.git
-cd <YOUR-REPO-NAME>
+git clone https://github.com/nadawaris/KoolKisaan.git
+cd KoolKisaan
 ```
 
 ### 2. (Optional) Rebuild Datasets
