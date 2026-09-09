@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KoolKisaan: Intelligent Farmer Query Analysis & Advisory System</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Chart.js (Local Copy) -->
+    <script src="chart.js"></script>
+    
+    <!-- Precompiled Data -->
+    <script src="data/data.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Top Decorative Leaf Border -->
+    <div class="leaf-decoration-top"></div>
+
+    <!-- Login Portal Overlay (NEW) -->
+    <div id="login-portal" class="login-portal-overlay">
+        <div class="login-card">
+            <div class="login-header">
+                <span class="login-logo-icon"><i class="fa-solid fa-seedling"></i></span>
+                <h2>Kool<span>Kisaan</span></h2>
+                <p>Intelligent Farmer Advisory Portal</p>
+            </div>
+            
+            <form id="login-form" onsubmit="return false;">
+                <div class="login-input-group">
+                    <label for="login-username"><i class="fa-solid fa-user"></i> Username</label>
+                    <input type="text" id="login-username" placeholder="Enter username (admin or user)" required autocomplete="username">
+                </div>
+                
+                <div class="login-input-group" style="margin-top: 1.25rem;">
+                    <label for="login-password"><i class="fa-solid fa-lock"></i> Password</label>
+                    <input type="password" id="login-password" placeholder="Enter password (admin123 or user123)" required autocomplete="current-password">
+                </div>
+                
+                <div class="login-error-msg hidden" id="login-error">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Invalid username or password!
+                </div>
+                
+                <button type="submit" class="btn btn-primary login-btn" id="btn-login-submit">
+                    <span>Sign In</span> <i class="fa-solid fa-arrow-right-to-bracket"></i>
+                </button>
+            </form>
+            
+            <div class="login-footer">
+                <p>IIT Ropar ANNAM.AI &bull; Fundamentals of AI</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-container hidden" id="main-app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo-area">
+                    <span class="logo-icon"><i class="fa-solid fa-seedling"></i></span>
+                    <h1 class="logo-text">Kool<span>Kisaan</span></h1>
+                </div>
+                <p class="tagline">Intelligent Farmer Advisory</p>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item active" data-tab="task1">
+                        <i class="fa-solid fa-chart-pie"></i>
+                        <span>Task 1: Query Analysis</span>
+                    </li>
+                    <li class="nav-item" data-tab="task2">
+                        <i class="fa-solid fa-tags"></i>
+                        <span>Task 2: Intent Classifier</span>
+                    </li>
+                    <li class="nav-item" data-tab="task3">
+                        <i class="fa-solid fa-magnifying-glass-nodes"></i>
+                        <span>Task 3: Similar Retrieval</span>
+                    </li>
+                    <li class="nav-item" data-tab="crud">
+                        <i class="fa-solid fa-database"></i>
+                        <span>Manage Datasets (CRUD)</span>
+                    </li>
+                    <li class="nav-item logout-item" id="nav-logout" style="margin-top: 2rem; border-top: 1px dashed rgba(255,255,255,0.15); padding-top: 1.5rem; color: #f87171;">
+                        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                        <span>Logout</span>
+                    </li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <p>IIT Ropar ANNAM.AI</p>
+                <small>Fundamentals of AI Project</small>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- HEADER -->
+            <header class="content-header">
+                <div class="header-title-area">
+                    <span class="breadcrumb">KoolKisaan Portal / <span id="current-tab-name">Task 1: Query Analysis</span></span>
+                    <h2 class="page-title" id="page-title-text">Task 1: Query Distribution and Analysis</h2>
+                </div>
+                <div class="header-status" style="display: flex; gap: 0.75rem; align-items: center;">
+                    <span class="badge" id="role-badge" style="background-color: var(--accent-light); color: var(--primary-dark); font-weight: 700; border: 1.5px solid var(--primary-light);"><i class="fa-solid fa-user-shield"></i> Admin</span>
+                    <span class="badge badge-success"><i class="fa-solid fa-circle-check"></i> Analysis Active</span>
+                </div>
+            </header>
+
+            <!-- TAB 1: TASK 1 - QUERY DISTRIBUTION & ANALYSIS -->
+            <section id="tab-task1" class="tab-pane active">
+                <!-- Data Source Selector Toggle -->
+                <div class="dataset-toggle-container">
+                    <button class="toggle-btn active" id="btn-toggle-queries"><i class="fa-solid fa-comments"></i> Farmer Query Trends</button>
+                    <button class="toggle-btn" id="btn-toggle-spoilage"><i class="fa-solid fa-temperature-arrow-up"></i> Crop Spoilage Analysis</button>
+                </div>
+
+                <!-- SUB-VIEW 1: QUERY ANALYSIS -->
+                <div id="subview-queries">
+                    <!-- KPI CARDS -->
+                    <div class="kpi-grid">
+                        <div class="kpi-card card">
+                            <div class="kpi-icon icon-green"><i class="fa-solid fa-clipboard-question"></i></div>
+                            <div class="kpi-info">
+                                <h3>Total Queries</h3>
+                                <p class="kpi-value" id="kpi-queries">2,000</p>
+                                <span class="kpi-subtext">Raksha Dataset</span>
+                            </div>
+                        </div>
+                        <div class="kpi-card card">
+                            <div class="kpi-icon icon-emerald"><i class="fa-solid fa-wheat-awn"></i></div>
+                            <div class="kpi-info">
+                                <h3>Unique Crops</h3>
+                                <p class="kpi-value" id="kpi-crops">28</p>
+                                <span class="kpi-subtext">Regex Extracted</span>
+                            </div>
+                        </div>
+                        <div class="kpi-card card">
+                            <div class="kpi-icon icon-teal"><i class="fa-solid fa-location-dot"></i></div>
+                            <div class="kpi-info">
+                                <h3>Active States</h3>
+                                <p class="kpi-value">5</p>
+                                <span class="kpi-subtext">Geographic Spread</span>
+                            </div>
+                        </div>
+                        <div class="kpi-card card">
+                            <div class="kpi-icon icon-danger"><i class="fa-solid fa-circle-exclamation"></i></div>
+                            <div class="kpi-info">
+                                <h3>Top Category</h3>
+                                <p class="kpi-value" style="font-size: 1.35rem; margin-top: 0.35rem;">Market Info</p>
+                                <span class="kpi-subtext">357 Queries (17.9%)</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CHARTS GRID -->
+                    <div class="charts-grid">
+                        <div class="chart-container card">
+                            <h3><i class="fa-solid fa-chart-pie"></i> Distribution of Farmer Query Intents</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="chart-intent"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container card">
+                            <h3><i class="fa-solid fa-map-location-dot"></i> Regional Query Volumetrics (States)</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="chart-state"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-container card">
+                            <h3><i class="fa-solid fa-seedling"></i> Crop Inquiry Volume (Top Identified Crops)</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="chart-crop"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-container card">
+                            <h3><i class="fa-solid fa-calendar-days"></i> Seasonal Trends (Monthly Inquiries)</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="chart-month"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- DATA INTERPRETATIONS PANEL -->
+                    <div class="insights-section card">
+                        <div class="insights-header">
+                            <h2><i class="fa-solid fa-lightbulb"></i> Dataset Interpretations & Strategic Agricultural Insights</h2>
+                            <p>Detailed analysis of query distributions to infer priority farmer concerns and emerging risk areas.</p>
+                        </div>
+                        
+                        <div class="insights-grid">
+                            <div class="insight-box">
+                                <div class="insight-title"><i class="fa-solid fa-ranking-star"></i> Priority Concerns (Intent Analysis)</div>
+                                <p><strong>Market Rates & Info</strong> (357 queries) and <strong>Plant Protection</strong> (348 queries) dominate farmer inquiries, accounting for <strong>35.2%</strong> of all interactions. This suggests that the immediate survival of the farming enterprise depends on two factors: securing fair prices for their harvest (minimizing middleman exploitation) and combating diseases/pests before they result in total crop loss.</p>
+                            </div>
+
+                            <div class="insight-box">
+                                <div class="insight-title"><i class="fa-solid fa-cloud-sun-rain"></i> Seasonal Trends & Planning</div>
+                                <p>Query volumes peak in <strong>January</strong> (768 queries) and <strong>February</strong> (695 queries) during the Rabi crop harvesting and early Kharif planning stages. Farmers inquire heavily about moisture conservation, late winter weather anomalies (rain and frost), and seed availability for subsequent sowing cycles, showing a clear alignment with regional agricultural calendars.</p>
+                            </div>
+
+                            <div class="insight-box">
+                                <div class="insight-title"><i class="fa-solid fa-triangle-exclamation"></i> Emerging Risk Areas</div>
+                                <p>A significant volume of queries in remote regions relates to pest infestation and sudden weather alerts. The lag in advisory services (averaging 18 days in Remote Blocks compared to 5 days in Urban-Near blocks) combined with low expert access creates a critical risk zone where unvalidated AI advisories can lead to crop failures.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB-VIEW 2: SPOILAGE ANALYSIS -->
+                <div id="subview-spoilage" class="hidden">
+                    <!-- KPI CARDS -->
+                    <div class="kpi-grid">
+                        <div class="kpi-card card">
+                            <div class="kpi-icon icon-green"><i class="fa-solid fa-database"></i></div>
+                            <div class="kpi-info">
+                                <h3>Total Records</h3>
+                                <p class="kpi-value" id="kpi-spoil-total">100</p>
+                                <span class="kpi-subtext">Transcribed Dataset</span>
+                            </div>
+                        </div>
+                        <div class="kpi-card card">
+                            <div class="kpi-icon icon-danger"><i class="fa-solid fa-temperature-arrow-up"></i></div>
+                            <div class="kpi-info">
+                                <h3>Spoiled Crops</h3>
+                                <p class="kpi-value" id="kpi-spoil-rate">54%</p>
+                                <span class="kpi-subtext">54 out of 100 cases</span>
+                            </div>
+                        </div>
+                        <div class="kpi-card card">
+                            <div class="kpi-icon icon-green"><i class="fa-solid fa-circle-check"></i></div>
+                            <div class="kpi-info">
+                                <h3>Fresh Crops</h3>
+                                <p class="kpi-value" id="kpi-fresh-rate">46%</p>
+                                <span class="kpi-subtext">46 out of 100 cases</span>
+                            </div>
+                        </div>
+                        <div class="kpi-card card">
+                            <div class="kpi-icon icon-emerald"><i class="fa-solid fa-wheat-awn"></i></div>
+                            <div class="kpi-info">
+                                <h3>Worst Crop</h3>
+                                <p class="kpi-value" style="font-size: 1.35rem; margin-top: 0.35rem;" id="kpi-worst-crop">Onion</p>
+                                <span class="kpi-subtext" id="kpi-worst-rate">69.6% Spoilage Rate</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CHARTS GRID -->
+                    <div class="charts-grid">
+                        <div class="chart-container card">
+                            <h3><i class="fa-solid fa-chart-bar"></i> Spoilage Rate by Crop Type (%)</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="chart-spoil-crop"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="chart-container card">
+                            <h3><i class="fa-solid fa-temperature-high"></i> Spoilage Rate by Temperature Range (%)</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="chart-spoil-temp"></canvas>
+                            </div>
+                        </div>
+
+                        <div class="chart-container card" style="grid-column: span 2;">
+                            <h3><i class="fa-solid fa-warehouse"></i> Storage Area Access Impact on Spoilage (%)</h3>
+                            <div class="chart-wrapper">
+                                <canvas id="chart-spoil-storage"></canvas>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- SPOILAGE INSIGHTS PANEL -->
+                    <div class="insights-section card">
+                        <div class="insights-header">
+                            <h2><i class="fa-solid fa-circle-nodes"></i> Spoilage Dataset Interpretations & Diagnostics</h2>
+                            <p>Analyzing key factors contributing to crop post-harvest decay.</p>
+                        </div>
+                        
+                        <div class="insights-grid">
+                            <div class="insight-box">
+                                <div class="insight-title"><i class="fa-solid fa-circle-exclamation"></i> Crop Susceptibility</div>
+                                <p><strong>Onion</strong> is highly vulnerable to spoilage, showing a severe <strong>69.6%</strong> decay rate. High moisture crops like Onion and Tomato (53.3%) require active ventilation to dry properly. Grains like Wheat (44.4%) are more stable due to their low natural humidity.</p>
+                            </div>
+
+                            <div class="insight-box">
+                                <div class="insight-title"><i class="fa-solid fa-temperature-high"></i> Temperature Influence</div>
+                                <p>Spoilage rates peak at <strong>60.7%</strong> in the <strong>30°C – 35°C</strong> range. Warm, humid air accelerates respiration and fungal multiplication. In dry extreme heat (>35°C), the spoilage rate drops to <strong>43.5%</strong> as rapid evaporation dehydrates cells before rot can spread.</p>
+                            </div>
+
+                            <div class="insight-box">
+                                <div class="insight-title"><i class="fa-solid fa-warehouse"></i> Closed Storage Dangers</div>
+                                <p>Crops stored inside a Storage Area spoiled <strong>more frequently (57.1%)</strong> than those kept outside (51.0%). This highlights that closed warehouses without active ventilation gather heat and relative humidity, creating a mold-breeding microclimate.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: TASK 2 - QUERY INTENT CLASSIFICATION -->
+            <section id="tab-task2" class="tab-pane">
+                <div class="console-grid">
+                    <!-- Intent Classification -->
+                    <div class="console-panel card">
+                        <div class="panel-header">
+                            <h2><i class="fa-solid fa-robot"></i> Query Intent Classifier Tool</h2>
+                            <p>Input a farmer query. The client-side TF-IDF Centroid model will predict its category in real-time.</p>
+                        </div>
+                        
+                        <div class="panel-body">
+                            <div class="input-area">
+                                <textarea id="classifier-input" placeholder="e.g., What is the price of Bengal Gram in Lucknow market?"></textarea>
+                                <div class="quick-examples">
+                                    <span class="example-tag" data-text="How can I control the attack of yellow mosaic virus on soybean?">Plant Protection</span>
+                                    <span class="example-tag" data-text="What is the government subsidy available for drip irrigation?">Govt Schemes</span>
+                                    <span class="example-tag" data-text="Is there any chance of rain in akola block next week?">Weather</span>
+                                    <span class="example-tag" data-text="Which wheat seed is best for late sowing conditions?">Seeds</span>
+                                </div>
+                                <button id="btn-classify" class="btn btn-primary"><i class="fa-solid fa-calculator"></i> Classify Query</button>
+                            </div>
+
+                            <div class="result-area hidden" id="classifier-result">
+                                <h3>Classifier Prediction Result</h3>
+                                <div class="classification-output">
+                                    <div class="predicted-category-box">
+                                        <span class="label">Predicted Intent</span>
+                                        <span class="category-name" id="class-predicted-name">Market Rates</span>
+                                    </div>
+                                    <div class="confidence-box">
+                                        <span class="label">Confidence Score</span>
+                                        <div class="confidence-bar-outer">
+                                            <div class="confidence-bar-inner" id="class-confidence-fill" style="width: 85%;"></div>
+                                        </div>
+                                        <span class="confidence-val" id="class-confidence-val">85%</span>
+                                    </div>
+                                </div>
+
+                                <div class="matching-keywords-box">
+                                    <h4>Classifier Decision Signals (Matching Vocabulary Terms):</h4>
+                                    <div class="keyword-tags" id="class-keywords">
+                                        <span>price</span>
+                                        <span>market</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Crop Spoilage Predictor AI -->
+                        <div class="panel-header" style="margin-top: 2rem; border-top: 1px solid var(--border-color); padding-top: 1.5rem;">
+                            <h2><i class="fa-solid fa-brain"></i> Crop Spoilage Risk Predictor</h2>
+                            <p>Predict whether your crop is at risk of post-harvest spoilage using our trained Naive Bayes classifier.</p>
+                        </div>
+                        <div class="panel-body">
+                            <div class="simulator-layout" style="grid-template-columns: 1fr; gap: 1rem;">
+                                <div class="sim-controls" style="gap: 0.85rem;">
+                                    <div class="control-group">
+                                        <label for="spoil-crop">Crop Type</label>
+                                        <select id="spoil-crop">
+                                            <option value="Onion">Onion (High Risk)</option>
+                                            <option value="Tomato">Tomato (High Risk)</option>
+                                            <option value="Maize">Maize (Medium Risk)</option>
+                                            <option value="Potato">Potato (Medium Risk)</option>
+                                            <option value="Wheat">Wheat (Low Risk)</option>
+                                        </select>
+                                    </div>
+                                    <div class="control-group">
+                                        <label for="spoil-loc">Location</label>
+                                        <select id="spoil-loc">
+                                            <option value="Village_A">Village A</option>
+                                            <option value="Village_B">Village B</option>
+                                            <option value="Village_C">Village C</option>
+                                        </select>
+                                    </div>
+                                    <div class="control-group">
+                                        <label for="spoil-temp">Storage Temperature: <span id="val-spoil-temp" class="range-val">30</span>°C</label>
+                                        <input type="range" id="spoil-temp" min="15" max="45" value="30" step="1">
+                                    </div>
+                                    <div class="control-group">
+                                        <label for="spoil-store">Storage Facility Access</label>
+                                        <select id="spoil-store">
+                                            <option value="Yes">Yes (Closed storage area)</option>
+                                            <option value="No">No (Open space/heaps)</option>
+                                        </select>
+                                    </div>
+                                    <button id="btn-predict-spoil" class="btn btn-emerald" style="margin-top: 0.5rem;"><i class="fa-solid fa-circle-question"></i> Predict Spoilage Risk</button>
+                                </div>
+                                
+                                <div class="sim-display hidden" id="spoil-result-area" style="margin-top: 1rem; padding: 1.25rem;">
+                                    <div class="risk-gauge-box" style="margin-bottom: 0.5rem;">
+                                        <h3 style="margin-bottom: 0.5rem;">AI Classifier Prediction</h3>
+                                        <div class="gauge-container">
+                                            <div class="gauge-bar-outer">
+                                                <div class="gauge-bar-inner" id="spoil-gauge-fill" style="width: 0%;"></div>
+                                            </div>
+                                            <span class="gauge-percentage" id="spoil-gauge-text">0%</span>
+                                        </div>
+                                        <div class="risk-badge" id="spoil-risk-badge">SAFE</div>
+                                    </div>
+                                    <div class="sim-feedback" style="border-top: none; padding-top: 0.5rem;">
+                                        <p id="spoil-advice-text" style="font-size: 0.9rem; line-height: 1.4;"></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Language Ambiguity & Refinement -->
+                    <div class="console-panel card">
+                        <div class="panel-header">
+                            <h2><i class="fa-solid fa-code-merge"></i> Ambiguity Solver & Model Refinement</h2>
+                            <p>Examine how overlapping words create language ambiguity and how our TF-IDF model resolves them.</p>
+                        </div>
+                        
+                        <div class="panel-body">
+                            <div class="ambiguity-explanation">
+                                <p>Natural language queries often contain vocabulary terms that point to multiple intents. To resolve this ambiguity, we compute term importance using <strong>TF-IDF</strong>: terms unique to specific classes (like <em>subsidy</em> or <em>mosaic</em>) receive high IDF weights, while common conversational noise is filtered out.</p>
+                            </div>
+
+                            <div class="ambiguity-grid">
+                                <h4>Interactive Ambiguity Examples (Click to Test):</h4>
+                                <div class="ambiguous-card" id="ambig-1" data-query="What is the government subsidy available for purchasing wheat seeds?">
+                                    <div class="ambig-header">
+                                        <span class="ambig-query-text">"What is the government subsidy available for purchasing wheat seeds?"</span>
+                                    </div>
+                                    <div class="ambig-body">
+                                        <div class="ambig-conflict"><strong>Conflicts:</strong> Schemes (subsidy) vs Seeds (wheat seeds).</div>
+                                        <div class="ambig-resolution"><strong>Resolution:</strong> The term <em>"subsidy"</em> has an IDF of 3.2 (very rare/informative), which overpowers the term <em>"seeds"</em> (IDF of 2.1). Correctly classified as <strong>Government Schemes</strong>.</div>
+                                    </div>
+                                </div>
+
+                                <div class="ambiguous-card" id="ambig-2" data-query="Will rain affect the market rate of onion?">
+                                    <div class="ambig-header">
+                                        <span class="ambig-query-text">"Will rain affect the market rate of onion?"</span>
+                                    </div>
+                                    <div class="ambig-body">
+                                        <div class="ambig-conflict"><strong>Conflicts:</strong> Weather (rain) vs Market (market rate).</div>
+                                        <div class="ambig-resolution"><strong>Resolution:</strong> <em>"rain"</em> (IDF 3.1) and <em>"market"</em> (IDF 2.2) both trigger. In centroid space, the query aligns slightly closer to <strong>Weather</strong> because winter weather queries contain high density of crop impacts.</div>
+                                    </div>
+                                </div>
+
+                                <div class="ambiguous-card" id="ambig-3" data-query="What fertilizer doses prevent blight attack on paddy?">
+                                    <div class="ambig-header">
+                                        <span class="ambig-query-text">"What fertilizer doses prevent blight attack on paddy?"</span>
+                                    </div>
+                                    <div class="ambig-body">
+                                        <div class="ambig-conflict"><strong>Conflicts:</strong> Nutrients (fertilizer doses) vs Protection (blight attack).</div>
+                                        <div class="ambig-resolution"><strong>Resolution:</strong> <em>"blight"</em> and <em>"attack"</em> have extremely strong associations in the **Plant Protection** centroid, successfully routing it to protection rather than standard nutrients.</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: TASK 3 - SIMILAR QUESTION RETRIEVAL -->
+            <section id="tab-task3" class="tab-pane">
+                <!-- Farmer Profiles Testing Workstation -->
+                <div class="profiles-section card">
+                    <div class="profiles-header">
+                        <h2><i class="fa-solid fa-users"></i> Predefined Farmer Profiles & Linguistic Query Testing Workstation</h2>
+                        <p>Select a profile and click on a query template below to dynamically test the spelling tolerance and retrieval accuracy of the Helpdesk AI.</p>
+                    </div>
+                    
+                    <div class="profiles-grid">
+                        <!-- Profile 1 -->
+                        <div class="profile-card card">
+                            <div class="profile-badge badge-smallholder"><i class="fa-solid fa-user"></i> Smallholder Farmer</div>
+                            <h4>Rinku Ram</h4>
+                            <p class="profile-meta">Uttar Pradesh &bull; 1.5 Acres &bull; Micro-farm Constraints</p>
+                            <div class="profile-scenarios">
+                                <button class="scenario-btn btn-std" data-query="How to register for government urea subsidy?">
+                                    <span class="lbl">Standard:</span> "How to register..."
+                                </button>
+                                <button class="scenario-btn btn-typo" data-query="hw to register for govt ourea subsdy">
+                                    <span class="lbl">Typos:</span> "govt ourea subsdy"
+                                </button>
+                                <button class="scenario-btn btn-severe" data-query="crop damage due to sudden hail storm and flood in block">
+                                    <span class="lbl">Severe:</span> Hail & floods
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Profile 2 -->
+                        <div class="profile-card card">
+                            <div class="profile-badge badge-organic"><i class="fa-solid fa-leaf"></i> Organic Cultivator</div>
+                            <h4>Savita Devi</h4>
+                            <p class="profile-meta">Karnataka &bull; 3 Acres &bull; Chemical-free Horticulture</p>
+                            <div class="profile-scenarios">
+                                <button class="scenario-btn btn-std" data-query="How to use neem seed kernel extract for tomato mosaic control?">
+                                    <span class="lbl">Standard:</span> "How to use neem..."
+                                </button>
+                                <button class="scenario-btn btn-typo" data-query="tomato leafe curry mosaic bug cure neem extract">
+                                    <span class="lbl">Typos:</span> "tomato leafe mosaic bug..."
+                                </button>
+                                <button class="scenario-btn btn-severe" data-query="organic crop certification process and bio-control guidelines">
+                                    <span class="lbl">Severe:</span> Bio-control cert
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Profile 3 -->
+                        <div class="profile-card card">
+                            <div class="profile-badge badge-commercial"><i class="fa-solid fa-tractor"></i> Large Commercial</div>
+                            <h4>Sardar Baldev Singh</h4>
+                            <p class="profile-meta">Punjab &bull; 25 Acres &bull; Industrial Mechanization</p>
+                            <div class="profile-scenarios">
+                                <button class="scenario-btn btn-std" data-query="What is the market price of basmati rice in Punjab APMC?">
+                                    <span class="lbl">Standard:</span> "What is the price..."
+                                </button>
+                                <button class="scenario-btn btn-typo" data-query="bamsati paddy rates in punjab mandi">
+                                    <span class="lbl">Typos:</span> "bamsati paddy mandi"
+                                </button>
+                                <button class="scenario-btn btn-severe" data-query="yellow rust disease spreading fast in wheat fields">
+                                    <span class="lbl">Severe:</span> Yellow rust spreading
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="helpdesk-layout">
+                    <!-- Search Side -->
+                    <div class="search-panel card">
+                        <div class="panel-header">
+                            <h2><i class="fa-solid fa-magnifying-glass"></i> Farmer Helpdesk Retrieval</h2>
+                            <p>Search for similar questions in our 2,000-query database to find past solutions.</p>
+                        </div>
+                        
+                        <div class="panel-body">
+                            <div class="input-area">
+                                <div class="search-bar-wrapper">
+                                    <input type="text" id="retriever-input" placeholder="Search farmer queries (e.g. fertilizer dosage for citrus, rain impact)...">
+                                    <button id="btn-search" class="btn btn-emerald"><i class="fa-solid fa-search"></i> Find Similar</button>
+                                </div>
+                            </div>
+
+                            <div class="retrieval-results" id="retriever-results-area">
+                                <div class="empty-state">
+                                    <i class="fa-solid fa-search"></i>
+                                    <p>Enter a query or click a profile scenario above to retrieve similar historical records.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FAQ Generator Side -->
+                    <div class="faq-panel card">
+                        <div class="panel-header">
+                            <h2><i class="fa-solid fa-file-invoice"></i> Dynamic FAQ & Advisory Advisor</h2>
+                            <p>Automatically drafted response using the nearest retrieved historical questions to assist helpdesk agents.</p>
+                        </div>
+                        
+                        <div class="panel-body">
+                            <div id="faq-empty-state" class="empty-state">
+                                <i class="fa-solid fa-keyboard"></i>
+                                <p>A draft agricultural advisory response will automatically generate here when you search and select a query.</p>
+                            </div>
+
+                            <div id="faq-draft-container" class="faq-draft-box hidden">
+                                <div class="draft-header">
+                                    <span class="draft-badge"><i class="fa-solid fa-pen-nib"></i> Draft Response</span>
+                                    <span class="draft-meta" id="draft-crop-cat">Crop: Citrus | Intent: Market</span>
+                                </div>
+                                <div class="draft-content">
+                                    <textarea id="faq-response-text" rows="7"></textarea>
+                                </div>
+                                <div class="draft-footer">
+                                    <button class="btn btn-primary" id="btn-copy-draft"><i class="fa-regular fa-clipboard"></i> Copy Draft to Clipboard</button>
+                                    <span class="copy-success hidden" id="copy-status"><i class="fa-solid fa-check"></i> Copied!</span>
+                                </div>
+
+                                <!-- Dynamic Semantic Adaptability Diagnosis -->
+                                <div class="advisory-rationale" id="semantic-diagnosis-box" style="margin-top: 1rem;">
+                                    <h4><i class="fa-solid fa-stethoscope"></i> Semantic Adaptability Diagnosis:</h4>
+                                    <p id="diagnosis-text">Execute a search to view spelling correction tolerance and vector tracking details.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- NEW TAB: CRUD DATA MANAGEMENT PANEL -->
+            <section id="tab-crud" class="tab-pane">
+                <div class="crud-layout card">
+                    <div class="crud-header">
+                        <div class="title-bar">
+                            <h2><i class="fa-solid fa-sliders"></i> Database Record Manager (CRUD)</h2>
+                            <button class="btn btn-primary" id="btn-add-record"><i class="fa-solid fa-plus"></i> Add New Record</button>
+                        </div>
+                        <p>Insert, search, edit, or delete records from our active databases. Remember to sync to local disk to persist changes.</p>
+                        <!-- Read-only warning banner (NEW) -->
+                        <div class="login-error-msg hidden" id="crud-readonly-banner" style="margin-top: 1rem; background-color: #fef3c7; color: #d97706; border-color: rgba(217, 119, 6, 0.2);">
+                            <i class="fa-solid fa-lock"></i> <strong>Read-Only Mode:</strong> Standard users can search and view records but cannot make modifications.
+                        </div>
+                        
+                        <div class="crud-actions-bar" style="margin-top: 1rem; display: flex; gap: 1rem; align-items: center; justify-content: space-between;">
+                            <div class="dataset-toggle-container" style="margin-bottom: 0; border: none; padding: 0;">
+                                <button class="toggle-btn active" id="btn-crud-toggle-queries"><i class="fa-solid fa-comments"></i> Farmer Queries</button>
+                                <button class="toggle-btn" id="btn-crud-toggle-spoilage"><i class="fa-solid fa-temperature-arrow-up"></i> Crop Spoilage</button>
+                            </div>
+                            
+                            <div class="crud-controls" style="display: flex; gap: 1rem; align-items: center;">
+                                <input type="text" id="crud-search" placeholder="Search table..." style="padding: 0.5rem 1rem; border: 1.5px solid var(--border-color); border-radius: var(--radius-md); font-family: var(--font-sans); width: 220px;">
+                                <button class="btn btn-emerald" id="btn-sync-disk"><i class="fa-solid fa-cloud-arrow-up"></i> Sync changes to Disk</button>
+                                <span id="sync-status" class="copy-success hidden" style="font-size: 0.85rem;"><i class="fa-solid fa-check"></i> Synced!</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="crud-table-wrapper" style="overflow-x: auto; margin-top: 1.5rem;">
+                        <table class="crud-table" id="crud-table-element">
+                            <thead>
+                                <tr id="crud-table-headers">
+                                    <!-- Dynamic headers -->
+                                </tr>
+                            </thead>
+                            <tbody id="crud-table-body">
+                                <!-- Dynamic rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="crud-pagination" style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                        <span id="crud-page-info" style="font-size: 0.85rem; color: var(--text-medium);">Showing 1 to 10 of 2000 entries</span>
+                        <div class="pagination-buttons" style="display: flex; gap: 0.5rem;">
+                            <button class="btn btn-emerald" id="btn-prev-page" style="padding: 0.4rem 1rem; font-size: 0.85rem;"><i class="fa-solid fa-angle-left"></i> Prev</button>
+                            <button class="btn btn-emerald" id="btn-next-page" style="padding: 0.4rem 1rem; font-size: 0.85rem;">Next <i class="fa-solid fa-angle-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- CRUD Form Dialog Modal Overlay (NEW) -->
+    <div class="modal-overlay hidden" id="crud-modal">
+        <div class="modal-card card">
+            <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1.5px solid var(--border-color); padding-bottom: 0.75rem;">
+                <h3 id="modal-title" style="color: var(--primary-dark); font-weight: 700; font-size: 1.25rem;"><i class="fa-solid fa-pen-to-square"></i> Add New Record</h3>
+                <button class="close-btn" id="btn-close-modal" style="background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--text-light);"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <form id="crud-form" onsubmit="return false;">
+                <!-- Fields are injected dynamically depending on active dataset -->
+                <div id="modal-fields-container" style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
+                </div>
+                
+                <div class="modal-actions" style="display: flex; justify-content: flex-end; gap: 1rem; border-top: 1px solid var(--border-color); padding-top: 1rem;">
+                    <button class="btn" id="btn-cancel-modal" type="button" style="background-color: var(--bg-main); color: var(--text-medium);">Cancel</button>
+                    <button class="btn btn-primary" id="btn-save-record" type="submit">Save Record</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Custom JavaScript -->
+    <script src="retriever.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

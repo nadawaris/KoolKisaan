@@ -1,0 +1,135 @@
+{
+  "total_queries": 2000,
+  "query_types": {
+    "Market Rates & Info": 357,
+    "Plant Protection": 348,
+    "Nutrient Management": 323,
+    "Seeds": 304,
+    "Government Schemes": 334,
+    "Weather": 334
+  },
+  "states": {
+    "KARNATAKA": 408,
+    "MAHARASHTRA": 383,
+    "UTTAR PRADESH": 424,
+    "MADHYA PRADESH": 388,
+    "TELANGANA": 397
+  },
+  "crops": {
+    "Onion": 99,
+    "Citrus": 41,
+    "Paddy/Rice": 102,
+    "Other Crops": 353,
+    "Wheat": 67,
+    "Orange": 45,
+    "Bengal Gram": 262,
+    "Turmeric": 229,
+    "Watermelon": 47,
+    "Pigeon Pea (Tur)": 116,
+    "Sesame": 70,
+    "Sugarcane": 70,
+    "Soybean": 149,
+    "Groundnut": 116,
+    "Tomato": 50,
+    "Cotton": 59,
+    "Maize": 60,
+    "Chilli": 65
+  },
+  "months": {
+    "3": 603,
+    "2": 667,
+    "1": 730
+  },
+  "risk_stats": {
+    "total_records": 300,
+    "wrong_decisions": 69,
+    "expert_validated": 82,
+    "avg_severity": 24.463428508193335,
+    "avg_gap": 24.589719568443332,
+    "region_distribution": {
+      "Urban_Near": 109,
+      "Semi_Remote": 100,
+      "Remote": 91
+    },
+    "region_wrong_decisions": {
+      "Remote": 20,
+      "Urban_Near": 29,
+      "Semi_Remote": 20
+    },
+    "expert_validation_wrong_decisions": {
+      "validated": 0,
+      "not_validated": 69,
+      "total_validated": 82,
+      "total_not_validated": 218
+    }
+  },
+  "spoilage_stats": {
+    "rates_by_crop": {
+      "Tomato": 53.3,
+      "Onion": 69.6,
+      "Wheat": 44.4,
+      "Potato": 47.6,
+      "Maize": 52.2
+    },
+    "rates_by_temp": {
+      "< 25C": 53.6,
+      "25C - 30C": 57.1,
+      "30C - 35C": 60.7,
+      "> 35C": 43.5
+    },
+    "rates_by_storage": {
+      "Yes": 57.1,
+      "No": 51.0
+    },
+    "class_counts": {
+      "Yes": 54,
+      "No": 46
+    },
+    "conditional_counts": {
+      "Yes": {
+        "crop": {
+          "Tomato": 8,
+          "Onion": 16,
+          "Potato": 10,
+          "Wheat": 8,
+          "Maize": 12
+        },
+        "location": {
+          "Village_C": 25,
+          "Village_A": 17,
+          "Village_B": 12
+        },
+        "temp_bin": {
+          "High": 27,
+          "Low": 27
+        },
+        "storage": {
+          "Yes": 28,
+          "No": 26
+        }
+      },
+      "No": {
+        "crop": {
+          "Wheat": 10,
+          "Maize": 11,
+          "Potato": 11,
+          "Onion": 7,
+          "Tomato": 7
+        },
+        "location": {
+          "Village_B": 20,
+          "Village_C": 11,
+          "Village_A": 15
+        },
+        "temp_bin": {
+          "High": 24,
+          "Low": 22
+        },
+        "storage": {
+          "Yes": 21,
+          "No": 25
+        }
+      }
+    }
+  }
+}
