@@ -21,8 +21,8 @@
 - [Quick Start & Installation](#-quick-start--installation)
 - [Default User Credentials](#-default-user-credentials)
 - [API & Persistence Layer](#-api--persistence-layer)
-- [Screenshots & UI Experience](#-screenshots--ui-experience)
 - [Course & Institutional Credits](#-course--institutional-credits)
+- [License](#-license)
 
 ---
 
