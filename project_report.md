@@ -1,34 +1,6 @@
 # Title: KoolKisaan: An Intelligent Farmer Query Classifier, Semantic Retrieval, and Post-Harvest Spoilage Advisory System with Role-Based Access Control
 
-**Course:** Fundamentals of AI Using Agriculture Data Set  
-**Offered Under:** ANNAM.AI – Centre of Excellence, Ministry of Education, Government of India, at IIT Ropar  
-**Student Name:** [Your Name Here]  
-**College Name:** [Your College Name Here]  
-**Year:** 2026  
 
----
-
-## Certificate
-
-This is to certify that **[Your Name Here]** from **[Your College Name Here]** has successfully completed the project work titled **"KoolKisaan: An Intelligent Farmer Query Classifier, Semantic Retrieval, and Post-Harvest Spoilage Advisory System with Role-Based Access Control"** as part of the 1-credit course *"Fundamentals of AI using Agriculture Data Set"*, offered under **ANNAM.AI – Centre of Excellence, Ministry of Education, Government of India, at IIT Ropar**. This project constitutes a component of the 30 hours of learning prescribed for the course and reflects the student's independent effort in problem selection, method design, and implementation.
-
----
-
-## Index
-
-1. **Introduction and Motivation**
-2. **Problem Statement**
-3. **Dataset Understanding**
-4. **Methodology**
-5. **Implementation Details**
-6. **Results and Discussions**
-7. **Conclusion**
-8. **References**
-9. **Appendix**
-
----
-
-## 1. Introduction and Motivation
 
 ### Application Context
 Agriculture forms the backbone of the socio-economic structure in developing regions, employing more than 50% of the active workforce. Despite its significance, farmers operate in a highly volatile environment characterized by unpredictable weather events, crop diseases, post-harvest losses, and lack of direct market transparency. To bridge this information gap, digital portals and tele-advisories receive thousands of unstructured natural language queries daily. Triaging these questions manually creates significant operational delays, preventing timely interventions that save crops from failure.
