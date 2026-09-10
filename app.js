@@ -63,6 +63,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     title = 'Task 3: Similar Question Retrieval';
                     breadcrumbText = 'Task 3: Similar Retrieval';
                     break;
+                case 'crop-doctor':
+                    title = 'Task 4: AI Crop Doctor (Vision Diagnostics)';
+                    breadcrumbText = 'Task 4: AI Crop Doctor';
+                    if (window.renderActiveCropDoctor) window.renderActiveCropDoctor();
+                    break;
+                case 'digital-twin':
+                    title = 'Task 5: Storage Digital Twin (Loss Forecaster)';
+                    breadcrumbText = 'Task 5: Storage Digital Twin';
+                    if (window.runDigitalTwinSim) window.runDigitalTwinSim();
+                    break;
+                case 'geo-map':
+                    title = 'Task 6: Geo-Spatial GIS & Mandi APMC';
+                    breadcrumbText = 'Task 6: GIS Map & Mandis';
+                    if (window.renderAgriMap) window.renderAgriMap();
+                    break;
                 case 'crud':
                     title = 'Database Record Manager (CRUD)';
                     breadcrumbText = 'Database CRUD Manager';
@@ -114,6 +129,9 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // Render initial charts
             renderCharts();
+            
+            // Initialize Pro Extensions (Voice AI, Crop Doctor, Digital Twin, Geo Map, Prescriptions)
+            initProExtensions();
             
         } catch (error) {
             console.error("Error loading agricultural precompiled data:", error);
@@ -1381,6 +1399,443 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // ==========================================================================
+    // PRO EXTENSIONS CONTROLLER (Voice AI, Crop Doctor, Digital Twin, Geo Map, Slip)
+    // ==========================================================================
+    let activeDoctorPreset = 'tomato_early_blight';
+    let proExtensionsInitialized = false;
+
+    function initProExtensions() {
+        if (proExtensionsInitialized) return;
+        proExtensionsInitialized = true;
+
+        // 1. Language Selector & Theme Switcher
+        const langSelector = document.getElementById('lang-selector');
+        if (langSelector) {
+            langSelector.addEventListener('change', (e) => {
+                const lang = e.target.value;
+                if (window.agriVoice) {
+                    window.agriVoice.setLanguage(lang);
+                }
+            });
+        }
+
+        const themeToggleBtn = document.getElementById('btn-theme-toggle');
+        if (themeToggleBtn) {
+            // Restore theme preference
+            if (localStorage.getItem('koolkisaan_theme') === 'dark') {
+                document.body.classList.add('dark-theme');
+                themeToggleBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
+            }
+            themeToggleBtn.addEventListener('click', () => {
+                document.body.classList.toggle('dark-theme');
+                const isDark = document.body.classList.contains('dark-theme');
+                localStorage.setItem('koolkisaan_theme', isDark ? 'dark' : 'light');
+                themeToggleBtn.innerHTML = isDark ? '<i class="fa-solid fa-sun"></i>' : '<i class="fa-solid fa-moon"></i>';
+            });
+        }
+
+        // 2. Voice AI Quick Mic (Header)
+        const btnQuickVoice = document.getElementById('btn-quick-voice');
+        const quickVoiceLabel = document.getElementById('quick-voice-label');
+        if (btnQuickVoice && window.agriVoice) {
+            btnQuickVoice.addEventListener('click', () => {
+                if (window.agriVoice.isListening) {
+                    window.agriVoice.stopListening();
+                    return;
+                }
+
+                btnQuickVoice.classList.add('listening');
+                if (quickVoiceLabel) quickVoiceLabel.textContent = 'Listening...';
+
+                window.agriVoice.startListening(
+                    (text, isFinal) => {
+                        if (isFinal) {
+                            btnQuickVoice.classList.remove('listening');
+                            if (quickVoiceLabel) quickVoiceLabel.textContent = 'Voice AI';
+
+                            // Check active tab
+                            const activePane = document.querySelector('.tab-pane.active');
+                            const activeTabId = activePane ? activePane.id : '';
+
+                            if (activeTabId === 'tab-task2') {
+                                const input = document.getElementById('classifier-input');
+                                if (input) {
+                                    input.value = text;
+                                    document.getElementById('btn-classify').click();
+                                }
+                            } else {
+                                // Default or Task 3: Switch to task3 and search
+                                const navTask3 = document.querySelector('.nav-item[data-tab="task3"]');
+                                if (navTask3) navTask3.click();
+                                const retInput = document.getElementById('retriever-input');
+                                if (retInput) {
+                                    retInput.value = text;
+                                    document.getElementById('btn-search').click();
+                                }
+                            }
+                        }
+                    },
+                    (isListening) => {
+                        if (!isListening) {
+                            btnQuickVoice.classList.remove('listening');
+                            if (quickVoiceLabel) quickVoiceLabel.textContent = 'Voice AI';
+                        }
+                    }
+                );
+            });
+        }
+
+        // Voice mic inside Task 2 Intent Classifier
+        const btnMicClassifier = document.getElementById('btn-mic-classifier');
+        if (btnMicClassifier && window.agriVoice) {
+            btnMicClassifier.addEventListener('click', () => {
+                if (window.agriVoice.isListening) {
+                    window.agriVoice.stopListening();
+                    return;
+                }
+                btnMicClassifier.classList.add('listening');
+                window.agriVoice.startListening(
+                    (text, isFinal) => {
+                        const input = document.getElementById('classifier-input');
+                        if (input) input.value = text;
+                        if (isFinal) {
+                            btnMicClassifier.classList.remove('listening');
+                            document.getElementById('btn-classify').click();
+                        }
+                    },
+                    (isListening) => {
+                        if (!isListening) btnMicClassifier.classList.remove('listening');
+                    }
+                );
+            });
+        }
+
+        // Voice mic inside Task 3 Retriever
+        const btnMicRetriever = document.getElementById('btn-mic-retriever');
+        if (btnMicRetriever && window.agriVoice) {
+            btnMicRetriever.addEventListener('click', () => {
+                if (window.agriVoice.isListening) {
+                    window.agriVoice.stopListening();
+                    return;
+                }
+                btnMicRetriever.classList.add('listening');
+                window.agriVoice.startListening(
+                    (text, isFinal) => {
+                        const input = document.getElementById('retriever-input');
+                        if (input) input.value = text;
+                        if (isFinal) {
+                            btnMicRetriever.classList.remove('listening');
+                            document.getElementById('btn-search').click();
+                        }
+                    },
+                    (isListening) => {
+                        if (!isListening) btnMicRetriever.classList.remove('listening');
+                    }
+                );
+            });
+        }
+
+        // TTS Read Aloud for Task 2 Classifier
+        const btnSpeakIntent = document.getElementById('btn-speak-intent');
+        if (btnSpeakIntent && window.agriVoice) {
+            btnSpeakIntent.addEventListener('click', () => {
+                const predictedName = document.getElementById('class-predicted-name').textContent;
+                const confidence = document.getElementById('class-confidence-val').textContent;
+                const message = `The predicted farmer query intent is ${predictedName}, with a confidence score of ${confidence}.`;
+                window.agriVoice.speak(message);
+            });
+        }
+
+        // Show speak button when classifier finishes
+        const btnClassify = document.getElementById('btn-classify');
+        if (btnClassify && btnSpeakIntent) {
+            const origClassifyClick = btnClassify.onclick;
+            btnClassify.addEventListener('click', () => {
+                setTimeout(() => {
+                    btnSpeakIntent.classList.remove('hidden');
+                }, 300);
+            });
+        }
+
+        // TTS Read Aloud for Task 3 Advisory
+        const btnReadAloud = document.getElementById('btn-read-aloud');
+        if (btnReadAloud && window.agriVoice) {
+            btnReadAloud.addEventListener('click', () => {
+                const draftText = document.getElementById('faq-response-text').value;
+                if (draftText) {
+                    window.agriVoice.speak(draftText);
+                }
+            });
+        }
+
+        // 3. TASK 4: AI CROP DOCTOR (Vision Diagnostics)
+        window.renderActiveCropDoctor = function(customImg = null) {
+            const canvas = document.getElementById('doctor-canvas');
+            if (!canvas || !window.agriCropDoctor) return;
+
+            window.agriCropDoctor.renderLeafToCanvas(canvas, activeDoctorPreset, customImg);
+            window.agriCropDoctor.drawBoundingBoxes(canvas, activeDoctorPreset);
+
+            // Update details
+            const preset = window.agriCropDoctor.getPreset(activeDoctorPreset);
+            document.getElementById('diag-crop-name').textContent = preset.crop;
+            document.getElementById('diag-disease-name').textContent = preset.diseaseName;
+            document.getElementById('diag-pathogen-type').textContent = preset.type;
+            document.getElementById('diag-confidence-num').textContent = `${preset.confidence}%`;
+            document.getElementById('diag-severity-text').textContent = preset.severity;
+            document.getElementById('diag-symptoms-text').textContent = preset.symptoms;
+            document.getElementById('diag-organic-recipe').textContent = preset.organicRecipe;
+            document.getElementById('diag-chemical-recipe').textContent = preset.chemicalRecipe;
+
+            // Update severity bar fill
+            const severityPercent = parseInt(preset.severity.match(/\d+/) ? preset.severity.match(/\d+/)[0] : '20');
+            const barFill = document.getElementById('diag-severity-fill');
+            if (barFill) {
+                barFill.style.width = `${severityPercent}%`;
+                barFill.style.backgroundColor = preset.themeColor;
+            }
+        };
+
+        // Preset selector clicks
+        const presetButtons = document.querySelectorAll('.preset-btn');
+        presetButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                presetButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                activeDoctorPreset = btn.getAttribute('data-preset');
+                window.renderActiveCropDoctor();
+            });
+        });
+
+        // Upload custom leaf image
+        const fileInput = document.getElementById('doctor-file-input');
+        if (fileInput) {
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (evt) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            window.renderActiveCropDoctor(img);
+                        };
+                        img.src = evt.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+
+        const btnScanAgain = document.getElementById('btn-scan-again');
+        if (btnScanAgain) {
+            btnScanAgain.addEventListener('click', () => {
+                window.renderActiveCropDoctor();
+            });
+        }
+
+        // TTS Read Aloud for Crop Doctor
+        const btnSpeakDoctor = document.getElementById('btn-speak-doctor');
+        if (btnSpeakDoctor && window.agriVoice) {
+            btnSpeakDoctor.addEventListener('click', () => {
+                const preset = window.agriCropDoctor.getPreset(activeDoctorPreset);
+                const speech = `Diagnosis: ${preset.crop} infected with ${preset.diseaseName}. Severity is ${preset.severity}. Organic remedy: ${preset.organicRecipe}. Chemical treatment: ${preset.chemicalRecipe}.`;
+                window.agriVoice.speak(speech);
+            });
+        }
+
+        // 4. TASK 5: STORAGE DIGITAL TWIN (Physics & Loss Simulator)
+        window.runDigitalTwinSim = function() {
+            if (!window.agriDigitalTwin) return;
+
+            const crop = document.getElementById('twin-crop').value;
+            const temp = parseFloat(document.getElementById('twin-temp').value);
+            const humidity = parseFloat(document.getElementById('twin-humidity').value);
+            const ventilation = document.getElementById('twin-ventilation').value;
+            const packaging = document.getElementById('twin-packaging').value;
+            const durationDays = parseFloat(document.getElementById('twin-duration').value);
+            const lotSizeQuintals = parseFloat(document.getElementById('twin-lotsize').value) || 100;
+            const customPrice = parseFloat(document.getElementById('twin-price').value) || 2800;
+
+            // Live pill labels
+            document.getElementById('val-twin-temp').textContent = `${temp}°C`;
+            document.getElementById('val-twin-humidity').textContent = `${humidity}%`;
+            document.getElementById('val-twin-duration').textContent = `${durationDays} Days`;
+
+            const sim = window.agriDigitalTwin.simulate({
+                crop,
+                temp,
+                humidity,
+                ventilation,
+                packaging,
+                durationDays,
+                lotSizeQuintals,
+                customPrice
+            });
+
+            // Update UI
+            document.getElementById('twin-shelf-days').textContent = sim.estimatedShelfLifeDays;
+            document.getElementById('twin-shelf-hours').textContent = `(~${sim.estimatedShelfLifeHours} Hours Remaining)`;
+
+            const gaugeBar = document.getElementById('twin-spoil-gauge');
+            if (gaugeBar) {
+                gaugeBar.style.width = `${sim.spoilageProbability}%`;
+                gaugeBar.style.backgroundColor = sim.riskColor;
+            }
+            document.getElementById('twin-spoil-val').textContent = `${sim.spoilageProbability}%`;
+
+            const badge = document.getElementById('twin-risk-badge');
+            if (badge) {
+                badge.className = `risk-badge ${sim.riskBadgeClass}`;
+                badge.textContent = sim.riskCategory;
+            }
+
+            document.getElementById('twin-total-val').textContent = `₹${sim.totalLotValue.toLocaleString()}`;
+            document.getElementById('twin-loss-val').textContent = `₹${sim.financialLossINR.toLocaleString()}`;
+            document.getElementById('twin-savings-val').textContent = `₹${sim.potentialSavingsINR.toLocaleString()}`;
+
+            const actionsList = document.getElementById('twin-actions-list');
+            if (actionsList) {
+                actionsList.innerHTML = sim.climateActions.map(action => `
+                    <li><i class="fa-solid fa-circle-arrow-right text-emerald"></i> ${action}</li>
+                `).join('');
+            }
+        };
+
+        // Attach live input events to twin controls
+        ['twin-crop', 'twin-temp', 'twin-humidity', 'twin-ventilation', 'twin-packaging', 'twin-duration', 'twin-lotsize', 'twin-price'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.addEventListener('input', () => window.runDigitalTwinSim());
+            }
+        });
+
+        const btnRunTwin = document.getElementById('btn-run-twin');
+        if (btnRunTwin) {
+            btnRunTwin.addEventListener('click', () => window.runDigitalTwinSim());
+        }
+
+        // 5. TASK 6: GEO-SPATIAL GIS MAP & MANDIS
+        window.renderAgriMap = function() {
+            if (!window.agriGeoEngine) return;
+
+            window.agriGeoEngine.renderMap('svg-map-render-area', (state) => {
+                document.getElementById('geo-selected-state-sub').textContent = `Selected Region: ${state.name}`;
+                document.getElementById('geo-state-name').textContent = state.name;
+                document.getElementById('geo-state-hub').innerHTML = `<i class="fa-solid fa-building-wheat"></i> APMC: ${state.mandiHub}`;
+                document.getElementById('geo-state-queries').textContent = state.queryCount;
+                document.getElementById('geo-alert-text').textContent = state.topAlert;
+                document.getElementById('geo-state-crops').textContent = state.topCrops.join(', ');
+                document.getElementById('geo-state-risk').textContent = state.storageRisk;
+
+                // Update alert banner styling
+                const banner = document.getElementById('geo-alert-banner');
+                if (banner) {
+                    if (state.topAlertSeverity === 'danger') {
+                        banner.style.backgroundColor = '#fee2e2';
+                        banner.style.color = '#991b1b';
+                        banner.style.borderLeftColor = '#ef4444';
+                    } else if (state.topAlertSeverity === 'warning') {
+                        banner.style.backgroundColor = '#fef3c7';
+                        banner.style.color = '#92400e';
+                        banner.style.borderLeftColor = '#f59e0b';
+                    } else {
+                        banner.style.backgroundColor = '#dcfce7';
+                        banner.style.color = '#166534';
+                        banner.style.borderLeftColor = '#22c55e';
+                    }
+                }
+            });
+
+            window.agriGeoEngine.renderTicker('mandi-ticker-container');
+        };
+
+        // Render ticker immediately on page load
+        if (window.agriGeoEngine) {
+            window.agriGeoEngine.renderTicker('mandi-ticker-container');
+        }
+
+        // 6. OFFICIAL KISAAN ADVISORY PRESCRIPTION MODAL
+        const prescriptionModal = document.getElementById('prescription-modal');
+        const btnCloseSlip = document.getElementById('btn-close-slip');
+        const btnDismissSlip = document.getElementById('btn-dismiss-slip');
+        const btnPrintSlip = document.getElementById('btn-print-slip');
+        const btnShareWhatsApp = document.getElementById('btn-share-whatsapp');
+
+        function openPrescriptionModal(options = {}) {
+            if (!prescriptionModal) return;
+
+            const refId = `KK-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+            const dateStr = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+
+            document.getElementById('slip-ref-id').textContent = `Ref: ${refId}`;
+            document.getElementById('slip-date-time').textContent = `Date: ${dateStr}`;
+
+            if (options.caseSummary) document.getElementById('slip-case-summary').innerHTML = options.caseSummary;
+            if (options.diagnosticSummary) document.getElementById('slip-diagnostic-summary').innerHTML = options.diagnosticSummary;
+            if (options.prescriptionText) document.getElementById('slip-prescription-text').innerHTML = options.prescriptionText;
+
+            prescriptionModal.classList.remove('hidden');
+        }
+
+        if (btnCloseSlip) btnCloseSlip.addEventListener('click', () => prescriptionModal.classList.add('hidden'));
+        if (btnDismissSlip) btnDismissSlip.addEventListener('click', () => prescriptionModal.classList.add('hidden'));
+
+        if (btnPrintSlip) {
+            btnPrintSlip.addEventListener('click', () => {
+                window.print();
+            });
+        }
+
+        if (btnShareWhatsApp) {
+            btnShareWhatsApp.addEventListener('click', () => {
+                const caseInfo = document.getElementById('slip-case-summary').innerText;
+                const diagInfo = document.getElementById('slip-diagnostic-summary').innerText;
+                const rxInfo = document.getElementById('slip-prescription-text').innerText;
+                const message = `*🌾 IIT Ropar ANNAM.AI - KoolKisaan Advisory Slip*\n\n📌 *Dossier:* ${caseInfo}\n🔍 *Diagnosis:* ${diagInfo}\n\n💊 *Prescribed Treatment (Rx):*\n${rxInfo}\n\n_Generated via KoolKisaan Precision Agriculture Portal_`;
+                const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
+                window.open(whatsappUrl, '_blank');
+            });
+        }
+
+        // Open slip from Crop Doctor
+        const btnGenerateSlipDoctor = document.getElementById('btn-generate-slip-doctor');
+        if (btnGenerateSlipDoctor) {
+            btnGenerateSlipDoctor.addEventListener('click', () => {
+                const preset = window.agriCropDoctor ? window.agriCropDoctor.getPreset(activeDoctorPreset) : null;
+                if (!preset) return;
+
+                openPrescriptionModal({
+                    caseSummary: `<strong>Crop:</strong> ${preset.crop} | <strong>Diagnosis Mode:</strong> Computer Vision Leaf Scan | <strong>Confidence:</strong> ${preset.confidence}%`,
+                    diagnosticSummary: `<strong>Pathogen:</strong> ${preset.diseaseName} (${preset.type})<br><strong>Severity:</strong> ${preset.severity}<br><strong>Symptoms:</strong> ${preset.symptoms}`,
+                    prescriptionText: `<strong>1. Bio-control / Organic Recipe:</strong><br>${preset.organicRecipe}<br><br><strong>2. Chemical Protection (IPM):</strong><br>${preset.chemicalRecipe}`
+                });
+            });
+        }
+
+        // Open slip from Task 3 FAQ
+        const btnGenerateSlipFaq = document.getElementById('btn-generate-slip-faq');
+        if (btnGenerateSlipFaq) {
+            btnGenerateSlipFaq.addEventListener('click', () => {
+                const cropMeta = document.getElementById('draft-crop-cat').textContent;
+                const adviceText = document.getElementById('faq-response-text').value;
+                const diagText = document.getElementById('diagnosis-text').textContent;
+
+                openPrescriptionModal({
+                    caseSummary: `<strong>Metadata:</strong> ${cropMeta} | <strong>Channel:</strong> Helpdesk Retrieval`,
+                    diagnosticSummary: `<strong>Semantic Match:</strong> ${diagText}`,
+                    prescriptionText: `<strong>Drafted Advisory Response:</strong><br>${adviceText.replace(/\n/g, '<br>')}`
+                });
+            });
+        }
+
+        // Initial renders for background tabs
+        window.renderActiveCropDoctor();
+        window.runDigitalTwinSim();
+        window.renderAgriMap();
+    }
+
     // Initialize Auth Check
     checkAuth();
 });
+
