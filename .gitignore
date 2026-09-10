@@ -21,3 +21,12 @@ desktop.ini
 # Temporary files
 *.tmp
 *.log
+
+# Node & Build artifacts
+node_modules/
+.next/
+dist/
+mongo-data/
+db.sqlite3
+.env*
+
