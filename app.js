@@ -1700,6 +1700,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     <li><i class="fa-solid fa-circle-arrow-right text-emerald"></i> ${action}</li>
                 `).join('');
             }
+
+            const sellingRec = document.getElementById('twin-selling-rec');
+            if (sellingRec) {
+                sellingRec.textContent = sim.sellingRecommendation;
+            }
+
+            const priceGrid = document.getElementById('twin-price-trend-grid');
+            if (priceGrid && sim.projectedPrices) {
+                priceGrid.innerHTML = sim.projectedPrices.map(item => `
+                    <div style="padding:0.5rem; background:var(--bg-main); border:1px solid var(--border-color); border-radius:6px; text-align:center;">
+                        <small style="color:var(--text-light); font-weight:600; display:block;">${item.day}</small>
+                        <strong style="color:var(--primary-dark); font-size:0.95rem;">₹${item.price.toLocaleString('en-IN')}</strong>
+                        <span style="font-size:0.72rem; font-weight:700; display:block; color:${item.trend.includes('Bullish') ? '#16a34a' : '#dc2626'};">${item.trend}</span>
+                    </div>
+                `).join('');
+            }
         };
 
         // Attach live input events to twin controls
